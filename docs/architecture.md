@@ -9,7 +9,8 @@ Frankfurter so visible FX metrics share one exchange-rate source.
 ```mermaid
 flowchart TD
   Browser[User Browser] --> Web[Next.js App Router]
-  Web --> RiskAPI[FastAPI Risk API]
+  Web --> BootGate[Readiness Boot Gate]
+  BootGate --> RiskAPI[FastAPI Risk API]
 
   Frankfurter[Frankfurter FX API] --> FXService[FX Service]
   GoogleRSS[Google News RSS] --> NewsService[News Service]
@@ -29,6 +30,11 @@ flowchart TD
 
 ## Frontend
 
+- `apps/web/src/components/data-boot-gate.tsx`: verifies connector readiness,
+  preloads the global risk payload, and preloads route-specific country/model
+  payloads before showing product pages.
+- `apps/web/src/components/app-loading-screen.tsx`: full-screen connectivity
+  status view used during boot and route transitions.
 - `apps/web/src/app/page.tsx`: server-seeded global dashboard.
 - `apps/web/src/app/rankings/page.tsx`: server-seeded rankings table.
 - `apps/web/src/app/country/[code]/page.tsx`: server-seeded country detail page.
@@ -43,6 +49,7 @@ than placeholder timelines.
 - `app/services/live_fx_risk.py`: combines FX, news, macro, and ML signals.
 - `app/services/news.py`: Google News RSS primary provider, GDELT backup, local NLP scoring.
 - `app/services/macro.py`: World Bank macro scoring.
+- `app/services/readiness.py`: connector health checks for the frontend boot gate.
 - `app/ml/news_sentiment.py`: local headline stress model.
 - `app/ml/risk_classifier.py`: historical FX regime classifier.
 

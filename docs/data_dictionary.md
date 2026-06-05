@@ -83,3 +83,14 @@
 | `macro_f1` | number/null | Macro-averaged F1 across stress labels. |
 | `crisis_precision` | number/null | Precision for the Crisis Risk class. |
 | `crisis_recall` | number/null | Recall for the Crisis Risk class. |
+
+## Readiness Fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `status` | string | `ready` when all required connector checks pass, otherwise `degraded`. |
+| `as_of` | string | UTC timestamp for the readiness report. |
+| `countries_loaded` | number | Number of country rows loaded by the global risk payload check. |
+| `connectors` | array | Connector-level status rows used by the frontend loading gate. |
+| `latency_ms` | number | Connector check latency in milliseconds. |
+| `detail` | string | Human-readable connector result or failure detail. |

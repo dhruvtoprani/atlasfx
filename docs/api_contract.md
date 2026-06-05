@@ -124,6 +124,30 @@ Returns classifier status, metrics, feature importance, labels, and limitations.
 
 Returns a per-country ML regime prediction for monitored non-USD currencies.
 
+## `GET /api/system/readiness`
+
+Checks connector readiness before the web app renders product routes. The
+frontend loading gate uses this endpoint to verify FX, news, macro, local NLP,
+and global country payload availability, then preloads route-specific country or
+model payloads when needed.
+
+```json
+{
+  "status": "ready",
+  "as_of": "2026-06-05T00:00:00Z",
+  "countries_loaded": 30,
+  "connectors": [
+    {
+      "name": "Frankfurter FX",
+      "status": "healthy",
+      "required": true,
+      "latency_ms": 320,
+      "detail": "Latest rates returned 29 symbols."
+    }
+  ]
+}
+```
+
 ## Removed Endpoints
 
 Replay endpoints were removed intentionally:

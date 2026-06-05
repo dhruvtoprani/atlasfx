@@ -9,6 +9,7 @@ import type {
   MlModelInfo,
   MlSignal,
   NlpEvaluationReport,
+  ReadinessResponse,
   NewsArticle,
   NewsSignal,
   SeriesPoint,
@@ -169,6 +170,21 @@ type ApiMlSignal = {
   top_features: ApiMlFeatureImportance[];
   training_examples: number | null;
   source: string;
+};
+
+type ApiConnectorStatus = {
+  name: string;
+  status: string;
+  required: boolean;
+  latency_ms: number;
+  detail: string;
+};
+
+type ApiReadinessResponse = {
+  status: string;
+  as_of: string;
+  countries_loaded: number;
+  connectors: ApiConnectorStatus[];
 };
 
 export type GlobalRiskData = {
@@ -348,6 +364,21 @@ function toNlpEvaluationReport(report: ApiNlpEvaluationReport): NlpEvaluationRep
   };
 }
 
+function toReadinessResponse(response: ApiReadinessResponse): ReadinessResponse {
+  return {
+    status: response.status,
+    asOf: response.as_of,
+    countriesLoaded: response.countries_loaded,
+    connectors: response.connectors.map((connector) => ({
+      name: connector.name,
+      status: connector.status,
+      required: connector.required,
+      latencyMs: connector.latency_ms,
+      detail: connector.detail,
+    })),
+  };
+}
+
 function toDisplaySeries(points: SeriesPoint[]): SeriesPoint[] {
   return points.map((point) => ({
     ...point,
@@ -395,4 +426,16 @@ export async function fetchModelInfo(): Promise<MlModelInfo> {
   }
 
   return toMlModelInfo((await response.json()) as ApiMlModelInfo);
+}
+
+export async function fetchReadiness(): Promise<ReadinessResponse> {
+  const response = await fetch(`${getApiBaseUrl()}/api/system/readiness`, {
+    headers: { Accept: "application/json" },
+  });
+
+  if (!response.ok) {
+    throw new Error(`AtlasFX readiness returned ${response.status}`);
+  }
+
+  return toReadinessResponse((await response.json()) as ApiReadinessResponse);
 }

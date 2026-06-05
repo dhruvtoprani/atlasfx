@@ -123,3 +123,11 @@ This file records major product and engineering decisions.
 **Alternatives considered:** Keeping Argentina, Egypt, and Nigeria with neutral FX gaps, or adding a second FX provider immediately.
 **Tradeoffs:** Smaller visible universe, but cleaner source integrity and no unsupported-currency caveats in the UI.
 **Status:** Accepted
+
+### 2026-06-05: Gate rendering on connector readiness
+
+**Decision:** AtlasFX shows a full-screen boot gate until required API connectors, the global risk payload, and route-specific payloads are loaded.
+**Why:** The portfolio demo should not flash partial, fallback, or stale states before live data readiness is established.
+**Alternatives considered:** Letting each page show independent loading states or rendering cached fallback data first.
+**Tradeoffs:** First paint can be slower when external sources are cold, but the visible product is more consistent and source-honest.
+**Status:** Accepted

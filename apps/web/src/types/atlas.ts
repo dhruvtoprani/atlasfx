@@ -146,3 +146,18 @@ export type CountryRiskDetail = CountryRiskRow & {
   macroSignal?: MacroSignal | null;
   mlSignal?: MlSignal | null;
 };
+
+export type ConnectorStatus = {
+  name: string;
+  status: string;
+  required: boolean;
+  latencyMs: number;
+  detail: string;
+};
+
+export type ReadinessResponse = {
+  status: string;
+  asOf: string;
+  countriesLoaded: number;
+  connectors: ConnectorStatus[];
+};

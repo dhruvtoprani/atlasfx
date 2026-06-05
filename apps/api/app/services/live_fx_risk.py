@@ -3,6 +3,7 @@ from __future__ import annotations
 from asyncio import gather
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
+from time import monotonic
 
 import httpx
 
@@ -38,6 +39,8 @@ REAL_DATA_SOURCE_SUMMARY = (
     "Frankfurter FX for all monitored currencies; Google News RSS + Atlas local NLP; "
     "World Bank macro; neutral no-data scoring only when a live source returns no observations"
 )
+LIVE_RISK_CACHE_TTL_SECONDS = 60 * 10
+_LIVE_RISK_CACHE: tuple[float, LiveRiskResult] | None = None
 
 
 def _parse_date(value: str) -> date:
@@ -331,17 +334,24 @@ async def _safe_historical_rates(symbols: tuple[str, ...]) -> dict:
 
 
 async def live_country_rows() -> LiveRiskResult:
+    global _LIVE_RISK_CACHE
+
+    if _LIVE_RISK_CACHE and monotonic() - _LIVE_RISK_CACHE[0] < LIVE_RISK_CACHE_TTL_SECONDS:
+        return _LIVE_RISK_CACHE[1]
+
     history, news_signals, macro_signals = await gather(
         _safe_historical_rates(SUPPORTED_CURRENCIES),
         all_country_news_signals(),
         all_country_macro_signals(),
     )
 
-    return LiveRiskResult(
+    result = LiveRiskResult(
         as_of=latest_history_date(history),
         rows=rows_from_history(history, news_signals, macro_signals),
         data_source=REAL_DATA_SOURCE_SUMMARY,
     )
+    _LIVE_RISK_CACHE = (monotonic(), result)
+    return result
 
 
 async def live_country_detail(

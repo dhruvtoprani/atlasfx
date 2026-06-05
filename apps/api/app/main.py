@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes import fx, macro, model, news, rankings, risk
+from app.routes import fx, macro, model, news, rankings, risk, system
 
 app = FastAPI(
     title="AtlasFX API",
@@ -23,6 +23,7 @@ app.include_router(rankings.router)
 app.include_router(news.router)
 app.include_router(macro.router)
 app.include_router(model.router)
+app.include_router(system.router)
 
 
 @app.get("/health")

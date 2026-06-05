@@ -99,3 +99,11 @@ This file tracks all implementation progress.
 - Known issues: None for deployment; next product work is raw data persistence and chronological ML backtesting.
 - How to test: Vercel production deployment completed with `readyState=READY`.
 - Notes for next agent/context: Production deployment id is `dpl_CfRS9uFjBfPR9QAcYiBt6t8YAJ8W`.
+
+### 2026-06-05 10:01
+- Files changed: `apps/api/app/services/readiness.py`, `apps/api/app/services/live_fx_risk.py`, `apps/api/app/routes/system.py`, `apps/api/app/schemas/system.py`, `apps/web/src/components/data-boot-gate.tsx`, `apps/web/src/components/app-loading-screen.tsx`, `apps/web/src/app/loading.tsx`, docs and continuity files.
+- What was implemented: Added `/api/system/readiness`, connector-level health checks, a full-screen AtlasFX loading screen, global risk preloading, route-specific preloading for country/model pages, and a short cache for the global risk payload.
+- What was fixed: Product pages no longer render before required live connector checks and the relevant API payloads finish loading.
+- Known issues: First paint can be slower on cold starts because readiness intentionally checks external FX, news, macro, NLP, and global risk paths before rendering.
+- How to test: Run `.venv/bin/pytest`, `.venv/bin/ruff check .`, `npm run lint`, and `npm run build`.
+- Notes for next agent/context: The boot gate is client-side and wraps all app routes through `apps/web/src/app/providers.tsx`.

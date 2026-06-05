@@ -50,6 +50,7 @@ score.
 - Baseline ML classifier with logistic regression vs random forest comparison
 - Local NLP holdout evaluation for headline stress scoring
 - Server-seeded pages so the app renders real API data first when the backend is running
+- API readiness gate that verifies FX, news, macro, NLP, global risk, and route payloads before rendering
 - Neutral no-data fallbacks only when a live source returns no observations
 
 ## Portfolio Positioning
@@ -82,6 +83,7 @@ flowchart LR
   end
 
   subgraph Web[Next.js Frontend]
+    BOOT[Readiness Boot Gate]
     MAP[Money Weather Map]
     RANK[Rankings]
     COUNTRY[Country Detail]
@@ -93,9 +95,11 @@ flowchart LR
   G --> NLP
   W --> MAC --> SCORE
   F --> ML
-  SCORE --> MAP
-  SCORE --> RANK
-  SCORE --> COUNTRY
+  SCORE --> BOOT
+  BOOT --> MAP
+  BOOT --> RANK
+  BOOT --> COUNTRY
+  BOOT --> MODEL
   NLP --> COUNTRY
   MAC --> COUNTRY
   ML --> COUNTRY
@@ -145,6 +149,7 @@ GET /api/macro/global
 GET /api/macro/country/{country_code}
 GET /api/model/feature-importance
 GET /api/model/predict/{country_code}
+GET /api/system/readiness
 ```
 
 ## Local Setup
