@@ -39,6 +39,7 @@ This file tracks unfinished work so progress can continue after context truncati
 - [x] Deploy Vercel preview
 - [x] Add GitHub Actions CI
 - [x] Add connector readiness gate and loading screen
+- [x] Add cinematic boot pacing and dashboard reveal
 - [ ] Persist fetched FX data under `data/raw`
 - [ ] Persist fetched RSS/GDELT data under `data/raw`
 - [ ] Add API integration tests

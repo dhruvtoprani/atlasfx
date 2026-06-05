@@ -107,3 +107,11 @@ This file tracks all implementation progress.
 - Known issues: First paint can be slower on cold starts because readiness intentionally checks external FX, news, macro, NLP, and global risk paths before rendering.
 - How to test: Run `.venv/bin/pytest`, `.venv/bin/ruff check .`, `npm run lint`, and `npm run build`.
 - Notes for next agent/context: The boot gate is client-side and wraps all app routes through `apps/web/src/app/providers.tsx`. Production deployment `dpl_DdcdMnUHQLdinagQVJGy4q4rWdM4` is aliased at `https://atlasfx-zeta.vercel.app`.
+
+### 2026-06-05 10:30
+- Files changed: `apps/web/src/components/data-boot-gate.tsx`, `apps/web/src/components/app-loading-screen.tsx`, `apps/web/src/app/globals.css`, `NEXT_STEPS.md`.
+- What was implemented: Added a minimum cinematic boot window, eased progress animation, staged scan phases, route payload rows, grid drift, scanline, and dashboard reveal animation.
+- What was fixed: Loading no longer visually snaps from 0 to 100 when connector responses are fast.
+- Known issues: None.
+- How to test: Run `npm run lint` and `npm run build` from `apps/web`.
+- Notes for next agent/context: This is purely frontend polish; the readiness/API behavior is unchanged.

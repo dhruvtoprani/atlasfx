@@ -34,3 +34,75 @@ select,
 button {
   font: inherit;
 }
+
+@keyframes atlas-grid-drift {
+  0% {
+    background-position:
+      0 0,
+      0 0;
+  }
+  100% {
+    background-position:
+      42px 28px,
+      -28px 42px;
+  }
+}
+
+@keyframes atlas-scanline {
+  0% {
+    transform: translateY(-42vh);
+    opacity: 0;
+  }
+  18%,
+  72% {
+    opacity: 0.75;
+  }
+  100% {
+    transform: translateY(54vh);
+    opacity: 0;
+  }
+}
+
+@keyframes atlas-card-in {
+  0% {
+    transform: translateY(18px) scale(0.985);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes atlas-dashboard-reveal {
+  0% {
+    filter: blur(12px);
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    filter: blur(0);
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.atlas-boot-grid {
+  background-image:
+    linear-gradient(rgba(34, 211, 238, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.06) 1px, transparent 1px);
+  background-size: 42px 42px;
+  animation: atlas-grid-drift 18s linear infinite;
+}
+
+.atlas-scanline {
+  animation: atlas-scanline 2.9s ease-in-out infinite;
+}
+
+.atlas-boot-card {
+  animation: atlas-card-in 720ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.atlas-dashboard-reveal {
+  animation: atlas-dashboard-reveal 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}

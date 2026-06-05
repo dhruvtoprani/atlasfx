@@ -2,14 +2,21 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { AppLoadingScreen } from "@/components/app-loading-screen";
 import { fetchCountryRisk, fetchGlobalRisk, fetchModelInfo, fetchReadiness } from "@/lib/api";
+import type { ConnectorStatus } from "@/types/atlas";
+
+const MIN_INITIAL_BOOT_MS = 2_600;
+const COMPLETE_HOLD_MS = 800;
 
 export function DataBootGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const routeCountryCode = getRouteCountryCode(pathname);
   const needsModelInfo = pathname === "/model";
+  const [bootStartedAt] = useState(() => Date.now());
+  const [initialBootCanReveal, setInitialBootCanReveal] = useState(false);
 
   const readinessQuery = useQuery({
     queryKey: ["system-readiness"],
@@ -50,12 +57,33 @@ export function DataBootGate({ children }: { children: React.ReactNode }) {
 
   const routePayloadReady =
     (!routeCountryCode || countryRiskQuery.isSuccess) && (!needsModelInfo || modelInfoQuery.isSuccess);
+  const dataReady = readinessQuery.data?.status === "ready" && globalRiskQuery.isSuccess && routePayloadReady;
 
-  if (readinessQuery.data?.status === "ready" && globalRiskQuery.isSuccess && routePayloadReady) {
-    return <>{children}</>;
+  useEffect(() => {
+    if (!dataReady || initialBootCanReveal) {
+      return;
+    }
+
+    const elapsed = Date.now() - bootStartedAt;
+    const revealDelay = Math.max(MIN_INITIAL_BOOT_MS - elapsed, COMPLETE_HOLD_MS);
+    const timer = window.setTimeout(() => {
+      setInitialBootCanReveal(true);
+    }, revealDelay);
+
+    return () => window.clearTimeout(timer);
+  }, [bootStartedAt, dataReady, initialBootCanReveal]);
+
+  if (dataReady && initialBootCanReveal) {
+    return <div className="atlas-dashboard-reveal">{children}</div>;
   }
 
-  const connectors = readinessQuery.data?.connectors;
+  const connectors = getDisplayConnectors({
+    connectors: readinessQuery.data?.connectors,
+    routeCountryCode,
+    countryRiskReady: countryRiskQuery.isSuccess,
+    needsModelInfo,
+    modelInfoReady: modelInfoQuery.isSuccess,
+  });
   const loadingDetail = getLoadingDetail({
     readinessReady: readinessQuery.data?.status === "ready",
     globalRiskReady: globalRiskQuery.isSuccess,
@@ -81,6 +109,7 @@ export function DataBootGate({ children }: { children: React.ReactNode }) {
       detail={loadingDetail}
       connectors={connectors}
       error={error}
+      isComplete={dataReady}
     />
   );
 }
@@ -122,4 +151,42 @@ function getLoadingDetail({
   }
 
   return "Finalizing live AtlasFX data before rendering.";
+}
+
+function getDisplayConnectors({
+  connectors,
+  routeCountryCode,
+  countryRiskReady,
+  needsModelInfo,
+  modelInfoReady,
+}: {
+  connectors?: ConnectorStatus[];
+  routeCountryCode: string | null;
+  countryRiskReady: boolean;
+  needsModelInfo: boolean;
+  modelInfoReady: boolean;
+}) {
+  const rows = [...(connectors ?? [])];
+
+  if (routeCountryCode) {
+    rows.push({
+      name: `${routeCountryCode} country payload`,
+      status: countryRiskReady ? "healthy" : "pending",
+      required: true,
+      latencyMs: 0,
+      detail: "Loading FX chart, macro indicators, NLP headlines, and ML signal.",
+    });
+  }
+
+  if (needsModelInfo) {
+    rows.push({
+      name: "Classifier diagnostics",
+      status: modelInfoReady ? "healthy" : "pending",
+      required: true,
+      latencyMs: 0,
+      detail: "Loading model comparison, metrics, and feature importance.",
+    });
+  }
+
+  return rows.length ? rows : undefined;
 }
