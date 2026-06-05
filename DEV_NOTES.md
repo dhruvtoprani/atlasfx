@@ -106,4 +106,4 @@ This file tracks all implementation progress.
 - What was fixed: Product pages no longer render before required live connector checks and the relevant API payloads finish loading.
 - Known issues: First paint can be slower on cold starts because readiness intentionally checks external FX, news, macro, NLP, and global risk paths before rendering.
 - How to test: Run `.venv/bin/pytest`, `.venv/bin/ruff check .`, `npm run lint`, and `npm run build`.
-- Notes for next agent/context: The boot gate is client-side and wraps all app routes through `apps/web/src/app/providers.tsx`.
+- Notes for next agent/context: The boot gate is client-side and wraps all app routes through `apps/web/src/app/providers.tsx`. Production deployment `dpl_DdcdMnUHQLdinagQVJGy4q4rWdM4` is aliased at `https://atlasfx-zeta.vercel.app`.
