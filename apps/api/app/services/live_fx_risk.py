@@ -13,8 +13,8 @@ from app.schemas.news import NewsSignal
 from app.schemas.risk import CountryRiskDetail, CountryRiskRow, Driver, SeriesPoint
 from app.services.fx import historical_rates
 from app.services.macro import all_country_macro_signals, country_macro_signal
-from app.services.mock_data import DRIVER_LABELS, score_country_from_signal
 from app.services.news import all_country_news_signals, country_news_signal
+from app.services.risk_builder import DRIVER_LABELS, score_country_from_signal
 from app.services.scoring import annualized_volatility, atlas_score, depreciation_percent, risk_label, top_driver
 
 
@@ -35,8 +35,8 @@ DEFAULT_REAL_SIGNAL = {
     "macro": NEUTRAL_COMPONENT_SCORE,
 }
 REAL_DATA_SOURCE_SUMMARY = (
-    "Real FX where Frankfurter covers the currency; Google News RSS + Atlas local NLP; "
-    "World Bank macro; neutral no-data scoring for source gaps"
+    "Frankfurter FX for all monitored currencies; Google News RSS + Atlas local NLP; "
+    "World Bank macro; neutral no-data scoring only when a live source returns no observations"
 )
 
 
@@ -87,11 +87,6 @@ def merge_live_fx_signal(country: Country, history: dict) -> tuple[dict[str, flo
         signal["fx_depreciation_score"] = 0.0
         signal["fx_volatility_score"] = 0.0
         return signal, "USD base currency"
-
-    if not country.frankfurter_supported:
-        signal["fx_depreciation_score"] = NEUTRAL_COMPONENT_SCORE
-        signal["fx_volatility_score"] = NEUTRAL_COMPONENT_SCORE
-        return signal, "FX unavailable in Frankfurter; neutral no-data FX score"
 
     live_signal = fx_signal_from_points(currency_points(history, country.currency))
     if not live_signal:
@@ -175,7 +170,7 @@ def country_detail_from_history(
     )
     row = row.model_copy(update={"top_driver": meaningful_top_driver(row, fx_quality)})
 
-    points = currency_points(history, country.currency) if country.frankfurter_supported else []
+    points = currency_points(history, country.currency)
     if country.currency == "USD":
         points = []
 
@@ -355,7 +350,7 @@ async def live_country_detail(
     include_macro: bool = True,
 ) -> CountryRiskDetail:
     tasks = []
-    if country.frankfurter_supported and country.currency != "USD":
+    if country.currency != "USD":
         tasks.append(_safe_historical_rates((country.currency,)))
     else:
         tasks.append(_safe_historical_rates(tuple()))

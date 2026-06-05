@@ -17,28 +17,28 @@ This file records major product and engineering decisions.
 **Decision:** AtlasFX starts with the weighted rule-based stress score from the PRD before adding ML.  
 **Why:** The product needs an explainable, working baseline before model complexity.  
 **Alternatives considered:** Training a classifier immediately.  
-**Tradeoffs:** Faster MVP and clearer explanations, but mock macro/news layers remain placeholders.  
+**Tradeoffs:** Faster MVP and clearer explanations, with source layers added incrementally.
 **Status:** Accepted
 
-### 2026-06-04: Mock macro and news layers stay visible
+### 2026-06-04: Macro and news placeholders define the first UI shape
 
-**Decision:** Macro and news stress are included as labeled mock scores in the first UI/API pass.  
-**Why:** The dashboard needs the full explainability shape before World Bank and GDELT ingestion are complete.  
+**Decision:** Macro and news stress are represented in the first UI/API pass while source integrations are being built.
+**Why:** The dashboard needs the full explainability shape before World Bank and news ingestion are complete.
 **Alternatives considered:** Hiding macro/news until integrations are real.  
-**Tradeoffs:** Better product completeness, but users must see the mock-data warning.  
+**Tradeoffs:** Better product completeness, but source status has to be explicit.
 **Status:** Accepted
 
 ### 2026-06-04: React Simple Maps installed with legacy peer resolution
 
 **Decision:** Keep `react-simple-maps` in the web app using `npm install --legacy-peer-deps`.  
 **Why:** The PRD requested React Simple Maps, but the package peer range has not caught up with React 19.  
-**Alternatives considered:** Hand-building a map mockup without the library.  
+**Alternatives considered:** Hand-building a map prototype without the library.
 **Tradeoffs:** Closer to the target stack, but dependency audits need follow-up.  
 **Status:** Revisit later
 
-### 2026-06-04: Live FX rows with static fallback
+### 2026-06-04: Live FX rows with neutral fallback
 
-**Decision:** Global risk and rankings fetch live Frankfurter FX metrics from FastAPI and fall back to static mock rows when the API is offline.  
+**Decision:** Global risk and rankings fetch live Frankfurter FX metrics from FastAPI and fall back to neutral no-data rows when the API is offline.
 **Why:** The MVP should keep working during local development while still showing real FX movement whenever the backend is available.  
 **Alternatives considered:** Blocking the UI on live API data or keeping the UI fully static.  
 **Tradeoffs:** Better resilience, but country detail pages need a second pass to use live series.  
@@ -46,7 +46,7 @@ This file records major product and engineering decisions.
 
 ### 2026-06-04: Country detail hydrates from API
 
-**Decision:** Country pages render a static fallback first and then hydrate from `/api/risk/country/{code}` with live FX series where available.  
+**Decision:** Country pages render neutral no-data fallback values first and then hydrate from `/api/risk/country/{code}` with live FX series.
 **Why:** This keeps dynamic pages resilient while showing live country-level FX movement once the backend responds.  
 **Alternatives considered:** Server-side fetching only or fully static detail pages.  
 **Tradeoffs:** Slightly more client-side complexity, but stronger local-development resilience.  
@@ -56,7 +56,7 @@ This file records major product and engineering decisions.
 
 **Decision:** AtlasFX uses GDELT headlines plus a local TF-IDF/logistic-regression model with crisis-theme lexicon features for news stress.  
 **Why:** The product needs an explainable non-LLM NLP layer that can score headlines without sending text to a language model.  
-**Alternatives considered:** LLM summarization, GDELT tone only, or continuing with static mock news scores.  
+**Alternatives considered:** LLM summarization, GDELT tone only, or continuing with static placeholder news scores.
 **Tradeoffs:** Fast and transparent, but less nuanced than a large pretrained language model and dependent on headline quality.  
 **Status:** Accepted
 
@@ -68,12 +68,12 @@ This file records major product and engineering decisions.
 **Tradeoffs:** RSS is free and simple, but it is less formally productized than a paid licensed news API.  
 **Status:** Accepted
 
-### 2026-06-04: Neutral no-data scores replace live-path mocks
+### 2026-06-04: Neutral no-data scores replace live-path placeholders
 
-**Decision:** When a source lacks coverage, AtlasFX uses neutral no-data component scores and labels the source gap instead of inventing mock movement or stress.  
+**Decision:** When a source lacks coverage, AtlasFX uses neutral no-data component scores and labels the source gap instead of inventing movement or stress.
 **Why:** The live product should not pretend unavailable data is real analysis.  
-**Alternatives considered:** Keeping mock values, excluding unsupported countries, or blocking the score until every source is available.  
-**Tradeoffs:** Scores remain comparable across the MVP universe, but unsupported FX can still influence totals through neutral baselines.  
+**Alternatives considered:** Keeping synthetic values, excluding affected countries, or blocking the score until every source is available.
+**Tradeoffs:** Scores remain comparable across the universe, but source quality has to be visible.
 **Status:** Accepted
 
 ### 2026-06-04: Remove replay scope
@@ -92,12 +92,12 @@ This file records major product and engineering decisions.
 **Tradeoffs:** Transparent and lightweight, but baseline metrics are limited by rare crisis labels and FX-only features.  
 **Status:** Accepted
 
-### 2026-06-04: Expand to 32 countries
+### 2026-06-04: Expand country coverage
 
-**Decision:** Add 12 more countries/regions where Frankfurter has supported currencies and World Bank coverage is clean.  
-**Why:** A broader map improves the portfolio demo without introducing unsupported FX data quality problems.  
+**Decision:** Add more countries/regions where Frankfurter and World Bank coverage are clean.
+**Why:** A broader map improves the portfolio demo while preserving source quality.
 **Alternatives considered:** Staying at 20 countries or adding all requested macro countries regardless of FX coverage.  
-**Tradeoffs:** Better product breadth, while `ARS`, `EGP`, and `NGN` still need a separate FX provider.  
+**Tradeoffs:** Better product breadth, with final public scope constrained by live FX availability.
 **Status:** Accepted
 
 ### 2026-06-04: Deploy with Vercel Services
@@ -114,4 +114,12 @@ This file records major product and engineering decisions.
 **Why:** Model comparison is a more defensible next step than adding SHAP to an unvalidated model.
 **Alternatives considered:** XGBoost/SHAP immediately.
 **Tradeoffs:** Less flashy than gradient boosting, but faster to deploy and easier to interpret under class imbalance.
+**Status:** Accepted
+
+### 2026-06-04: Track only current Frankfurter currencies
+
+**Decision:** Limit the public AtlasFX universe to the 30 currencies currently returned by Frankfurter `/currencies`, represented as countries/regions in the dashboard.
+**Why:** A portfolio demo is stronger when every visible FX metric can be backed by the same live exchange-rate source.
+**Alternatives considered:** Keeping Argentina, Egypt, and Nigeria with neutral FX gaps, or adding a second FX provider immediately.
+**Tradeoffs:** Smaller visible universe, but cleaner source integrity and no unsupported-currency caveats in the UI.
 **Status:** Accepted

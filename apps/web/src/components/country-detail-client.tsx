@@ -21,7 +21,9 @@ export function CountryDetailClient({ initialCountry }: { initialCountry: Countr
     retry: 1,
   });
   const sourceDetail = isError
-    ? "API offline; static fallback"
+    ? country.dataQuality.startsWith("Live API unavailable")
+      ? "API offline; neutral no-data fallback"
+      : country.dataQuality
     : isFetching && country.dataQuality === initialCountry.dataQuality
       ? "Connecting to AtlasFX API"
       : country.dataQuality;
@@ -60,8 +62,8 @@ export function CountryDetailClient({ initialCountry }: { initialCountry: Countr
           <p className="mt-5 text-xs uppercase tracking-[0.16em] text-slate-500">Data Quality</p>
           <p className="mt-2 text-lg font-semibold text-white">{sourceDetail}</p>
           <p className="mt-4 text-sm leading-6 text-slate-400">
-            Country pages pull Frankfurter FX where covered, RSS headlines scored by local NLP, and latest World Bank
-            macro indicators. Source gaps use neutral no-data scores instead of mock stress.
+            Country pages pull Frankfurter FX for every monitored non-USD currency, RSS headlines scored by local NLP,
+            and latest World Bank macro indicators. Missing source observations use neutral no-data scores.
           </p>
           <p className="mt-4 inline-flex items-center gap-2 text-xs text-cyan-100">
             <DatabaseZap className="size-3.5" aria-hidden="true" />
@@ -180,7 +182,7 @@ export function CountryDetailClient({ initialCountry }: { initialCountry: Countr
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
                 <p className="text-xs uppercase tracking-[0.16em] text-slate-500">Latest Indicators</p>
-                <h2 className="mt-2 text-xl font-semibold text-white">Macro fragility scored without mock data</h2>
+                <h2 className="mt-2 text-xl font-semibold text-white">Macro fragility from World Bank data</h2>
               </div>
               <span className="rounded-md border border-white/10 px-2.5 py-1 text-xs text-slate-400">
                 as of {country.macroSignal.asOf}

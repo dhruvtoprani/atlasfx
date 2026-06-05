@@ -67,8 +67,8 @@ export function RankingsTable({ initialData }: { initialData: GlobalRiskData }) 
           ))}
         </div>
         <p className="text-xs text-slate-500">
-          {isError
-            ? "API offline; static fallback"
+          {isError && data.dataSource === fallbackGlobalRiskData.dataSource
+            ? "API offline; neutral no-data fallback"
             : isFetching && data.dataSource === fallbackGlobalRiskData.dataSource
               ? "Connecting to AtlasFX API"
               : data.dataSource}

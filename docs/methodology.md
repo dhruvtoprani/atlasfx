@@ -15,19 +15,18 @@ advice, or a trading recommendation.
 
 ## Country Universe
 
-AtlasFX currently tracks 32 countries/regions. The universe includes the
-original 20 PRD countries plus additional Frankfurter-supported currencies:
-Sweden, Norway, Denmark, New Zealand, Singapore, Hong Kong, Czechia, Hungary,
-Israel, Malaysia, Philippines, and Romania.
+AtlasFX currently tracks 30 countries/regions that match the live Frankfurter
+`/currencies` response. This keeps every visible non-USD FX metric on the same
+exchange-rate source.
 
 ## FX Layer
 
-Supported currencies use Frankfurter historical USD-based rates.
+Every monitored non-USD currency uses Frankfurter historical USD-based rates.
 
 - 30-day depreciation is positive when the local currency weakens versus USD.
 - 30-day volatility uses daily log returns annualized by `sqrt(252)`.
-- Frankfurter-unsupported currencies keep raw FX movement as unavailable and
-  receive neutral no-data FX component scores instead of invented depreciation.
+- If Frankfurter returns no observations for a request, AtlasFX uses a neutral
+  no-data FX component for that response rather than inventing movement.
 
 ## News Layer
 
@@ -48,7 +47,7 @@ Macro stress uses latest available World Bank indicators:
 - Unemployment: `SL.UEM.TOTL.ZS`
 - Current account balance: `BN.CAB.XOKA.GD.ZS`
 
-Missing macro coverage receives a neutral no-data score instead of a mock value.
+Missing macro coverage receives a neutral no-data score.
 
 ## ML Classifiers
 

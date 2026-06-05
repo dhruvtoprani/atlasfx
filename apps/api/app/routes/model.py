@@ -31,7 +31,7 @@ async def predict_country(country_code: str) -> MlSignal:
         raise HTTPException(status_code=404, detail="Country is not in the AtlasFX universe.")
 
     history = {"rates": {}}
-    if country.frankfurter_supported and country.currency != "USD":
+    if country.currency != "USD":
         history = await historical_rates(
             symbols=(country.currency,),
             start=date.today() - timedelta(days=130),

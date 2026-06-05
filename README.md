@@ -6,7 +6,11 @@ AtlasFX is a portfolio-grade financial ML dashboard that turns exchange-rate
 movement, headline sentiment, and macro indicators into an explainable
 country-level currency stress signal.
 
-**Live preview:** [atlasfx-kau9l2q16-dhruv-kekin-topranis-projects.vercel.app](https://atlasfx-kau9l2q16-dhruv-kekin-topranis-projects.vercel.app)
+**Live preview:** [atlasfx-84zwjxszk-dhruv-kekin-topranis-projects.vercel.app](https://atlasfx-84zwjxszk-dhruv-kekin-topranis-projects.vercel.app)
+
+## Demo
+
+![AtlasFX demo walkthrough](docs/assets/atlasfx-demo.gif)
 
 It does **not** forecast exact FX prices and it does **not** provide financial
 advice. The product goal is early stress detection: show where pressure is
@@ -17,8 +21,8 @@ score.
 
 | Area | Status |
 | --- | --- |
-| Country universe | 32 countries/regions |
-| FX data | Frankfurter historical rates where supported |
+| Country universe | 30 countries/regions, matching the current Frankfurter `/currencies` coverage |
+| FX data | Frankfurter historical rates for every monitored non-USD currency |
 | News data | Google News RSS primary, GDELT backup |
 | NLP | Local TF-IDF + logistic regression headline stress model |
 | Macro data | World Bank indicators |
@@ -32,6 +36,8 @@ score.
 
 ![AtlasFX country detail](docs/assets/atlasfx-country-detail.png)
 
+![AtlasFX rankings](docs/assets/atlasfx-rankings.png)
+
 ![AtlasFX model page](docs/assets/atlasfx-model.png)
 
 ## What Works
@@ -44,13 +50,17 @@ score.
 - Baseline ML classifier with logistic regression vs random forest comparison
 - Local NLP holdout evaluation for headline stress scoring
 - Server-seeded pages so the app renders real API data first when the backend is running
-- Neutral no-data scores for source gaps instead of fake mock stress values
+- Neutral no-data fallbacks only when a live source returns no observations
 
-## Removed Scope
+## Portfolio Positioning
 
-Historical replay timelines were removed. The project now prioritizes real
-current signals, explainable scoring, and ML classification over placeholder
-timeline demos.
+AtlasFX is intentionally scoped as a serious financial ML product demo:
+
+- **Real source discipline:** every monitored currency exists in the current Frankfurter API.
+- **Explainability first:** every country score exposes weighted drivers and source quality.
+- **Non-LLM NLP:** headline stress is scored by a local auditable model, not an opaque prompt.
+- **Model honesty:** classifier metrics, class imbalance, and limitations are visible in the UI.
+- **No trading claims:** the product frames signals as research analytics, not investment advice.
 
 ## Architecture
 
@@ -200,19 +210,18 @@ Current validation status:
 
 ## Known Limitations
 
-- `ARS`, `EGP`, and `NGN` do not have Frankfurter historical FX coverage; AtlasFX labels this and uses neutral no-data FX component scores.
 - The baseline ML classifiers are FX-regime-only; news and macro are not yet part of historical ML features.
 - Crisis labels are rare in the Frankfurter training windows, so classifier metrics must be interpreted as baseline diagnostics.
+- Google News RSS is free/keyless and useful for demos, but it is less formally productized than a paid licensed news feed.
 - No financial advice, investment advice, or trading recommendations.
 
 ## Roadmap
 
-1. Add a second clean historical FX provider for unsupported currencies.
-2. Persist raw source responses with reproducible dataset versioning.
+1. Persist raw source responses with reproducible dataset versioning.
+2. Add chronological backtests for the FX regime classifier.
 3. Add historical feature tables for news and macro.
-4. Train tree-based classifiers and compare against logistic regression.
-5. Add SHAP explanations and similar historical windows.
-6. Deploy frontend/backend and add CI.
+4. Add permutation importance or SHAP explanations.
+5. Add similar historical windows for country-level explanations.
 
 ## Disclaimer
 

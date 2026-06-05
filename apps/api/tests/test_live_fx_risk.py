@@ -1,4 +1,4 @@
-from app.models.countries import COUNTRY_BY_CODE
+from app.models.countries import COUNTRIES, COUNTRY_BY_CODE
 from app.services.live_fx_risk import (
     apply_news_signal,
     country_detail_from_history,
@@ -37,14 +37,10 @@ def test_fx_signal_from_points_detects_depreciation() -> None:
 def test_rows_from_history_marks_live_supported_currencies() -> None:
     rows = rows_from_history(SAMPLE_HISTORY)
     japan = next(row for row in rows if row.currency == "JPY")
-    argentina = next(row for row in rows if row.currency == "ARS")
 
     assert japan.data_quality == "Live FX from Frankfurter; Neutral news no-data; Neutral macro no-data"
-    assert (
-        argentina.data_quality
-        == "FX unavailable in Frankfurter; neutral no-data FX score; Neutral news no-data; "
-        "Neutral macro no-data"
-    )
+    assert len(rows) == len(COUNTRIES)
+    assert all(not row.data_quality.startswith("FX unavailable in Frankfurter") for row in rows)
 
 
 def test_country_detail_from_history_uses_live_fx_series() -> None:

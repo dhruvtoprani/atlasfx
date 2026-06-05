@@ -83,3 +83,11 @@ This file tracks all implementation progress.
 - Known issues: Preview has not been promoted to production because production promotion was not explicitly requested.
 - How to test: Local checks passed with `.venv/bin/pytest`, `.venv/bin/ruff check .`, `npm run lint`, and `npm run build`.
 - Notes for next agent/context: If production is requested, run `vercel deploy --prod` after an in-browser smoke test of the preview.
+
+### 2026-06-04 20:55
+- Files changed: `apps/api/app/models/countries.py`, `apps/api/app/services/risk_builder.py`, `apps/api/app/services/live_fx_risk.py`, `apps/api/app/routes/*`, `apps/web/src/lib/atlas-data.ts`, `apps/web/src/components/*`, `README.md`, `docs/*`, `docs/assets/*`.
+- What was implemented: Restricted AtlasFX to the 30 currencies currently returned by Frankfurter, added Iceland/ISK, removed unsupported FX countries, removed live API mock modes, refreshed GitHub screenshots, and added `docs/assets/atlasfx-demo.gif`.
+- What was fixed: Frontend fallback now uses neutral no-data values rather than invented stress; server-seeded live data no longer displays API-offline status when a client refetch fails.
+- Known issues: Production promotion is still pending explicit approval; chronological ML backtesting and raw source persistence remain next.
+- How to test: `.venv/bin/pytest`, `.venv/bin/ruff check .`, `npm run lint`, and `npm run build` all pass.
+- Notes for next agent/context: Final preview is `https://atlasfx-84zwjxszk-dhruv-kekin-topranis-projects.vercel.app`; if approved, promote with `vercel deploy --prod`.

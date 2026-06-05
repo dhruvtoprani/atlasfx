@@ -11,13 +11,14 @@
 
 ## `GET /api/risk/global`
 
-Returns live risk rows for the 32-country AtlasFX universe.
+Returns live risk rows for the 30-country AtlasFX universe backed by the
+current Frankfurter currency list.
 
 ```json
 {
   "as_of": "2026-06-04",
   "global_risk_mode": "Watchlist",
-  "data_source": "Real FX where Frankfurter covers the currency; Google News RSS + Atlas local NLP; World Bank macro; neutral no-data scoring for source gaps",
+  "data_source": "Frankfurter FX for all monitored currencies; Google News RSS + Atlas local NLP; World Bank macro; neutral no-data scoring only when a live source returns no observations",
   "countries": []
 }
 ```
@@ -121,8 +122,7 @@ Returns classifier status, metrics, feature importance, labels, and limitations.
 
 ## `GET /api/model/predict/{country_code}`
 
-Returns a per-country ML regime prediction where Frankfurter supports the
-currency.
+Returns a per-country ML regime prediction for monitored non-USD currencies.
 
 ## Removed Endpoints
 

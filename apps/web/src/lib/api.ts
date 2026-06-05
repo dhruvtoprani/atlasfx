@@ -179,9 +179,9 @@ export type GlobalRiskData = {
 };
 
 export const fallbackGlobalRiskData: GlobalRiskData = {
-  asOf: "mock",
+  asOf: "no-live-api",
   globalRiskMode: globalRiskMode(),
-  dataSource: "Static MVP mock fallback",
+  dataSource: "Live API unavailable; neutral no-data fallback",
   countries: countryRiskRows,
 };
 
@@ -195,7 +195,6 @@ function toCountryRiskRow(row: ApiCountryRiskRow): CountryRiskRow {
     region: row.region,
     latitude: fallback?.latitude ?? 0,
     longitude: fallback?.longitude ?? 0,
-    frankfurterSupported: fallback?.frankfurterSupported ?? false,
     riskScore: row.risk_score,
     riskLabel: row.risk_label,
     fx30dDepreciation: row.fx_30d_depreciation,

@@ -50,7 +50,7 @@ class CountryRiskDetail(CountryRiskRow):
 class GlobalRiskResponse(BaseModel):
     as_of: str
     global_risk_mode: str
-    data_source: str = "Mock MVP data"
+    data_source: str
     countries: list[CountryRiskRow]
     disclaimer: str = Field(
         default=(

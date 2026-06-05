@@ -1,6 +1,8 @@
 # AtlasFX Architecture
 
 AtlasFX is a monorepo with a Next.js frontend and FastAPI backend.
+The public country universe is constrained to currencies currently returned by
+Frankfurter so visible FX metrics share one exchange-rate source.
 
 ## System Diagram
 

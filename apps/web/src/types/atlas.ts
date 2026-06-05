@@ -7,7 +7,6 @@ export type CountryMeta = {
   region: string;
   latitude: number;
   longitude: number;
-  frankfurterSupported: boolean;
 };
 
 export type CountryRiskRow = CountryMeta & {

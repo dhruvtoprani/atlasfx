@@ -32,14 +32,12 @@ CURRENCY_ALIASES = {
     "BRL": "real",
     "INR": "rupee",
     "ZAR": "rand",
-    "EGP": "pound",
-    "NGN": "naira",
     "THB": "baht",
     "KRW": "won",
     "IDR": "rupiah",
     "CNY": "yuan",
-    "ARS": "peso",
     "PLN": "zloty",
+    "ISK": "krona",
 }
 
 NEWS_CACHE_TTL_SECONDS = 60 * 60 * 6

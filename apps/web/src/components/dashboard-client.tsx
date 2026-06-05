@@ -138,7 +138,9 @@ export function DashboardClient({ initialData = fallbackGlobalRiskData }: { init
 }
 
 function sourceStatus(data: GlobalRiskData, isError: boolean, isFetching: boolean) {
-  if (isError) return "API offline; showing static MVP fallback";
+  if (isError && data.dataSource === fallbackGlobalRiskData.dataSource) {
+    return "API offline; showing neutral no-data fallback";
+  }
   if (isFetching && data.dataSource === fallbackGlobalRiskData.dataSource) return "Connecting to AtlasFX API";
   return data.dataSource;
 }

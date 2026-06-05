@@ -5,7 +5,7 @@ import { DISCLAIMER } from "@/lib/atlas-data";
 const items = [
   { icon: Globe2, title: "Research Objective", body: "Combine FX behavior, macro conditions, and news sentiment into country-level stress signals." },
   { icon: Database, title: "Data Sources", body: "Frankfurter powers FX. Google News RSS feeds the local NLP layer. World Bank powers macro stress." },
-  { icon: Map, title: "Roadmap", body: "Tighten data persistence, add unsupported FX coverage, then upgrade the baseline classifier with SHAP explanations." },
+  { icon: Map, title: "Roadmap", body: "Persist source snapshots, add chronological ML backtests, and upgrade explanations with permutation importance or SHAP." },
   { icon: ShieldAlert, title: "Disclaimer", body: DISCLAIMER },
 ];
 

@@ -9,8 +9,8 @@
 | `currency` | string | ISO 4217 currency code. |
 | `risk_score` | number | Weighted AtlasFX Stress Score from 0 to 100. |
 | `risk_label` | string | Stable, Watchlist, Stress, Storm, or Crisis Risk. |
-| `fx_30d_depreciation` | number | Local currency depreciation versus USD over 30 days where supported. |
-| `fx_volatility_30d` | number | Annualized 30-day volatility using daily log returns where supported. |
+| `fx_30d_depreciation` | number | Local currency depreciation versus USD over 30 days for monitored non-USD currencies. |
+| `fx_volatility_30d` | number | Annualized 30-day volatility using daily log returns for monitored non-USD currencies. |
 | `news_stress_score` | number | RSS/GDELT headline stress score from local NLP, or neutral no-data score. |
 | `macro_stress_score` | number | World Bank macro stress score, or neutral no-data score. |
 | `top_driver` | string | Largest meaningful component contributor to the score. |
@@ -25,7 +25,7 @@
 | --- | --- | --- |
 | `as_of` | string | Latest FX date used by the global risk response. |
 | `global_risk_mode` | string | Aggregate market-weather label across countries. |
-| `data_source` | string | Source summary for FX, news, macro, and source gaps. |
+| `data_source` | string | Source summary for FX, news, macro, and neutral no-data handling. |
 | `countries` | array | Country risk rows sorted by stress score. |
 
 ## Component Scores

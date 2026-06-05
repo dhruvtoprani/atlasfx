@@ -333,7 +333,7 @@ def unavailable_model_info(reason: str) -> MlModelInfo:
 
 
 async def country_ml_signal(country: Country, history: dict) -> MlSignal:
-    if not country.frankfurter_supported or country.currency == "USD":
+    if country.currency == "USD":
         return MlSignal(
             country_code=country.country_code,
             country_name=country.country_name,
@@ -346,7 +346,7 @@ async def country_ml_signal(country: Country, history: dict) -> MlSignal:
             features={},
             top_features=[],
             training_examples=None,
-            source="No Frankfurter historical FX coverage for this currency.",
+            source="USD is the Frankfurter base currency, so no local-currency FX feature vector is generated.",
         )
 
     points = parse_history_points(history, country.currency)

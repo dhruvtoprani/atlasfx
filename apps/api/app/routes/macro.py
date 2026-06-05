@@ -17,6 +17,6 @@ async def get_global_macro() -> list[MacroSignal]:
 async def get_country_macro(country_code: str) -> MacroSignal:
     country = COUNTRY_BY_CODE.get(country_code.upper())
     if not country:
-        raise HTTPException(status_code=404, detail="Country is not in the AtlasFX MVP set.")
+        raise HTTPException(status_code=404, detail="Country is not in the AtlasFX universe.")
 
     return await country_macro_signal(country)
