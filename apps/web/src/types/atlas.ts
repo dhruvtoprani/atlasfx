@@ -87,14 +87,27 @@ export type MlMetricReport = {
   classDistribution: Record<string, number>;
 };
 
+export type NlpEvaluationReport = {
+  modelType: string;
+  holdoutExamples: number;
+  accuracy: number;
+  stressPrecision: number;
+  stressRecall: number;
+  stablePrecision: number;
+  stableRecall: number;
+};
+
 export type MlModelInfo = {
   modelType: string;
   status: string;
+  selectedModel: string | null;
   source: string;
   labels: string[];
   features: string[];
   metrics: MlMetricReport | null;
+  modelComparison: Record<string, MlMetricReport>;
   featureImportance: MlFeatureImportance[];
+  nlpEvaluation: NlpEvaluationReport | null;
   limitations: string[];
 };
 

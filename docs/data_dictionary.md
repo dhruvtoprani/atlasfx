@@ -71,3 +71,15 @@
 | `features` | object | Current FX feature vector used for prediction. |
 | `top_features` | array | Highest model feature-importance values. |
 | `training_examples` | number/null | Historical examples used for model training. |
+
+## Model Evaluation Fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `selected_model` | string/null | Best baseline model selected by macro-F1, crisis recall, then accuracy. |
+| `model_comparison` | object | Per-model metrics for logistic regression and random forest. |
+| `nlp_evaluation` | object/null | Holdout metrics for the local headline NLP stress model. |
+| `accuracy` | number/null | Share of correct predictions in the evaluation split. |
+| `macro_f1` | number/null | Macro-averaged F1 across stress labels. |
+| `crisis_precision` | number/null | Precision for the Crisis Risk class. |
+| `crisis_recall` | number/null | Recall for the Crisis Risk class. |

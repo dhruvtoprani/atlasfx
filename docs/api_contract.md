@@ -87,8 +87,9 @@ Returns classifier status, metrics, feature importance, labels, and limitations.
 
 ```json
 {
-  "model_type": "Logistic regression FX regime classifier",
+  "model_type": "FX regime classifier: Random Forest",
   "status": "trained",
+  "selected_model": "Random Forest",
   "source": "Frankfurter historical FX windows; labels are future 30-day depreciation buckets",
   "labels": ["Stable", "Watchlist", "Stress", "Crisis Risk"],
   "features": [
@@ -105,6 +106,14 @@ Returns classifier status, metrics, feature importance, labels, and limitations.
     "crisis_recall": 0.5,
     "training_examples": 5019,
     "test_examples": 1673
+  },
+  "model_comparison": {},
+  "nlp_evaluation": {
+    "model_type": "TF-IDF + logistic regression headline stress classifier",
+    "holdout_examples": 10,
+    "accuracy": 0.9,
+    "stress_precision": 1.0,
+    "stress_recall": 0.8
   },
   "feature_importance": []
 }

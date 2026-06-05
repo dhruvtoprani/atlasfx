@@ -99,3 +99,19 @@ This file records major product and engineering decisions.
 **Alternatives considered:** Staying at 20 countries or adding all requested macro countries regardless of FX coverage.  
 **Tradeoffs:** Better product breadth, while `ARS`, `EGP`, and `NGN` still need a separate FX provider.  
 **Status:** Accepted
+
+### 2026-06-04: Deploy with Vercel Services
+
+**Decision:** Deploy AtlasFX as a Vercel Services project with Next.js at `/` and FastAPI mounted under `/server`.
+**Why:** This keeps the public demo to one URL while preserving a real Python backend.
+**Alternatives considered:** Vercel frontend plus Render/Railway backend, or frontend-only static deployment.
+**Tradeoffs:** Services is newer Vercel infrastructure, but it simplifies portfolio sharing and avoids CORS complexity.
+**Status:** Accepted
+
+### 2026-06-04: Compare ML baselines before SHAP
+
+**Decision:** Compare logistic regression and random forest baselines before adding heavier explainability tools.
+**Why:** Model comparison is a more defensible next step than adding SHAP to an unvalidated model.
+**Alternatives considered:** XGBoost/SHAP immediately.
+**Tradeoffs:** Less flashy than gradient boosting, but faster to deploy and easier to interpret under class imbalance.
+**Status:** Accepted

@@ -6,6 +6,7 @@ from time import monotonic
 
 import httpx
 import numpy as np
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from sklearn.pipeline import Pipeline
@@ -13,6 +14,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
 from app.models.countries import SUPPORTED_CURRENCIES, Country
+from app.ml.news_sentiment import evaluate_news_model
 from app.schemas.ml import MlFeatureImportance, MlMetricReport, MlModelInfo, MlSignal
 from app.services.fx import historical_rates
 from app.services.scoring import annualized_volatility, depreciation_percent
@@ -26,7 +28,7 @@ FEATURE_NAMES = [
     "fx_volatility_90d",
     "fx_trend_acceleration",
 ]
-MODEL_TYPE = "Logistic regression FX regime classifier"
+MODEL_TYPE = "FX regime classifier"
 MODEL_CACHE_TTL_SECONDS = 60 * 60 * 24
 _MODEL_CACHE: tuple[float, "ClassifierState"] | None = None
 
@@ -43,8 +45,10 @@ class TrainingExample:
 
 @dataclass(frozen=True)
 class ClassifierState:
-    model: Pipeline
+    model: Pipeline | RandomForestClassifier
+    selected_model: str
     metrics: MlMetricReport
+    model_comparison: dict[str, MlMetricReport]
     feature_importance: list[MlFeatureImportance]
 
 
@@ -139,25 +143,84 @@ def train_classifier(examples: list[TrainingExample]) -> ClassifierState:
         stratify=labels,
     )
 
-    x_train = np.array([example.features for example in train_examples])
-    y_train = np.array([example.label for example in train_examples])
-    x_test = np.array([example.features for example in test_examples])
-    y_test = np.array([example.label for example in test_examples])
+    x_train, y_train, x_test, y_test = split_feature_arrays(train_examples, test_examples)
 
-    model = Pipeline(
-        steps=[
-            ("scaler", StandardScaler()),
-            (
-                "classifier",
-                LogisticRegression(class_weight="balanced", max_iter=1000, random_state=42),
-            ),
-        ]
+    candidates: dict[str, Pipeline | RandomForestClassifier] = {
+        "Logistic Regression": Pipeline(
+            steps=[
+                ("scaler", StandardScaler()),
+                (
+                    "classifier",
+                    LogisticRegression(class_weight="balanced", max_iter=1000, random_state=42),
+                ),
+            ]
+        ),
+        "Random Forest": RandomForestClassifier(
+            n_estimators=240,
+            min_samples_leaf=3,
+            class_weight="balanced_subsample",
+            random_state=42,
+            n_jobs=-1,
+        ),
+    }
+
+    comparison: dict[str, MlMetricReport] = {}
+    for name, candidate in candidates.items():
+        candidate.fit(x_train, y_train)
+        comparison[name] = evaluate_candidate(
+            candidate,
+            x_test,
+            y_test,
+            len(train_examples),
+            len(test_examples),
+            examples,
+        )
+
+    selected_name = max(
+        comparison,
+        key=lambda name: (
+            comparison[name].macro_f1 or 0,
+            comparison[name].crisis_recall or 0,
+            comparison[name].accuracy or 0,
+        ),
     )
-    model.fit(x_train, y_train)
-    predictions = model.predict(x_test)
+    model = candidates[selected_name]
+    metrics = comparison[selected_name]
 
-    class_distribution = {label: sum(1 for example in examples if example.label == label) for label in CLASS_LABELS}
-    metrics = MlMetricReport(
+    return ClassifierState(
+        model=model,
+        selected_model=selected_name,
+        metrics=metrics,
+        model_comparison=comparison,
+        feature_importance=extract_feature_importance(model),
+    )
+
+
+def split_feature_arrays(
+    train_examples: list[TrainingExample],
+    test_examples: list[TrainingExample],
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    return (
+        np.array([example.features for example in train_examples]),
+        np.array([example.label for example in train_examples]),
+        np.array([example.features for example in test_examples]),
+        np.array([example.label for example in test_examples]),
+    )
+
+
+def evaluate_candidate(
+    model: Pipeline | RandomForestClassifier,
+    x_test: np.ndarray,
+    y_test: np.ndarray,
+    train_count: int,
+    test_count: int,
+    examples: list[TrainingExample],
+) -> MlMetricReport:
+    predictions = model.predict(x_test)
+    class_distribution = {
+        label: sum(1 for example in examples if example.label == label) for label in CLASS_LABELS
+    }
+    return MlMetricReport(
         accuracy=round(float(accuracy_score(y_test, predictions)), 3),
         macro_f1=round(float(f1_score(y_test, predictions, average="macro", zero_division=0)), 3),
         crisis_precision=round(
@@ -184,25 +247,26 @@ def train_classifier(examples: list[TrainingExample]) -> ClassifierState:
             ),
             3,
         ),
-        training_examples=len(train_examples),
-        test_examples=len(test_examples),
+        training_examples=train_count,
+        test_examples=test_count,
         class_distribution=class_distribution,
     )
-    return ClassifierState(
-        model=model,
-        metrics=metrics,
-        feature_importance=extract_feature_importance(model),
-    )
 
 
-def extract_feature_importance(model: Pipeline) -> list[MlFeatureImportance]:
-    classifier = model.named_steps["classifier"]
-    coefficients = np.abs(classifier.coef_).mean(axis=0)
-    total = float(coefficients.sum()) or 1.0
+def extract_feature_importance(
+    model: Pipeline | RandomForestClassifier,
+) -> list[MlFeatureImportance]:
+    if isinstance(model, Pipeline):
+        classifier = model.named_steps["classifier"]
+        values = np.abs(classifier.coef_).mean(axis=0)
+    else:
+        values = model.feature_importances_
+
+    total = float(values.sum()) or 1.0
     return sorted(
         [
             MlFeatureImportance(feature=feature, importance=round(float(value / total), 3))
-            for feature, value in zip(FEATURE_NAMES, coefficients, strict=True)
+            for feature, value in zip(FEATURE_NAMES, values, strict=True)
         ],
         key=lambda item: item.importance,
         reverse=True,
@@ -232,13 +296,16 @@ async def model_info() -> MlModelInfo:
         return unavailable_model_info(str(error))
 
     return MlModelInfo(
-        model_type=MODEL_TYPE,
+        model_type=f"{MODEL_TYPE}: {state.selected_model}",
         status="trained",
+        selected_model=state.selected_model,
         source="Frankfurter historical FX windows; labels are future 30-day depreciation buckets",
         labels=CLASS_LABELS,
         features=FEATURE_NAMES,
         metrics=state.metrics,
+        model_comparison=state.model_comparison,
         feature_importance=state.feature_importance,
+        nlp_evaluation=evaluate_news_model(),
         limitations=[
             "Baseline classifier is FX-regime-only; news and macro are used in the AtlasFX score but not yet in historical ML features.",
             "Reported metrics use a stratified holdout because crisis labels are rare; chronological backtesting is a next step.",
@@ -252,6 +319,7 @@ def unavailable_model_info(reason: str) -> MlModelInfo:
     return MlModelInfo(
         model_type=MODEL_TYPE,
         status=f"unavailable: {reason}",
+        selected_model=None,
         source="Frankfurter historical FX windows",
         labels=CLASS_LABELS,
         features=FEATURE_NAMES,
@@ -346,12 +414,12 @@ async def country_ml_signal(country: Country, history: dict) -> MlSignal:
         country_name=country.country_name,
         currency=country.currency,
         status="trained",
-        model_type=MODEL_TYPE,
+        model_type=f"{MODEL_TYPE}: {state.selected_model}",
         predicted_label=predicted_label,
         crisis_probability=class_probabilities.get("Crisis Risk", 0.0),
         class_probabilities=class_probabilities,
         features=dict(zip(FEATURE_NAMES, features, strict=True)),
         top_features=state.feature_importance[:3],
         training_examples=state.metrics.training_examples,
-        source="Prediction from logistic regression trained on historical Frankfurter FX windows.",
+        source=f"Prediction from {state.selected_model} trained on historical Frankfurter FX windows.",
     )

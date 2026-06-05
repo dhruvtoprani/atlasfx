@@ -6,6 +6,8 @@ AtlasFX is a portfolio-grade financial ML dashboard that turns exchange-rate
 movement, headline sentiment, and macro indicators into an explainable
 country-level currency stress signal.
 
+**Live preview:** [atlasfx-kau9l2q16-dhruv-kekin-topranis-projects.vercel.app](https://atlasfx-kau9l2q16-dhruv-kekin-topranis-projects.vercel.app)
+
 It does **not** forecast exact FX prices and it does **not** provide financial
 advice. The product goal is early stress detection: show where pressure is
 building, why the model thinks it matters, and which signals are driving the
@@ -20,7 +22,7 @@ score.
 | News data | Google News RSS primary, GDELT backup |
 | NLP | Local TF-IDF + logistic regression headline stress model |
 | Macro data | World Bank indicators |
-| ML classifier | Logistic regression FX regime classifier trained on historical Frankfurter windows |
+| ML classifier | Logistic regression and random forest FX regime classifiers trained on historical Frankfurter windows |
 | Frontend | Next.js, React, TypeScript, Tailwind, Recharts, React Simple Maps |
 | Backend | FastAPI, Pydantic, Pandas/NumPy, scikit-learn |
 
@@ -39,7 +41,8 @@ score.
 - Country detail pages with FX movement, volatility, risk breakdown, top drivers, and source quality
 - RSS headline ingestion scored by a local non-LLM NLP model
 - World Bank macro scoring for inflation, GDP growth, unemployment, and current-account pressure
-- Baseline ML classifier for future FX stress regime labels
+- Baseline ML classifier with logistic regression vs random forest comparison
+- Local NLP holdout evaluation for headline stress scoring
 - Server-seeded pages so the app renders real API data first when the backend is running
 - Neutral no-data scores for source gaps instead of fake mock stress values
 
@@ -99,9 +102,9 @@ AtlasFX Stress Score =
 + 0.20 * Macro Stress Score
 ```
 
-The current ML classifier is separate from the rule score. It trains a logistic
-regression model on historical Frankfurter FX windows and labels each window by
-future 30-day depreciation:
+The current ML classifier is separate from the rule score. It trains baseline
+logistic regression and random forest models on historical Frankfurter FX
+windows and labels each window by future 30-day depreciation:
 
 | Future 30-day depreciation | Label |
 | ---: | --- |
@@ -193,11 +196,12 @@ Current validation status:
 - Backend lint: passing
 - Frontend lint: passing
 - Frontend production build: passing
+- GitHub Actions CI: configured for backend and frontend checks
 
 ## Known Limitations
 
 - `ARS`, `EGP`, and `NGN` do not have Frankfurter historical FX coverage; AtlasFX labels this and uses neutral no-data FX component scores.
-- The baseline ML classifier is FX-regime-only; news and macro are not yet part of historical ML features.
+- The baseline ML classifiers are FX-regime-only; news and macro are not yet part of historical ML features.
 - Crisis labels are rare in the Frankfurter training windows, so classifier metrics must be interpreted as baseline diagnostics.
 - No financial advice, investment advice, or trading recommendations.
 

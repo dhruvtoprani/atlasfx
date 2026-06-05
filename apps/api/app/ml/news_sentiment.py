@@ -6,8 +6,10 @@ from re import findall
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, precision_score, recall_score
 from sklearn.pipeline import Pipeline
 
+from app.schemas.ml import NlpEvaluationReport
 from app.services.scoring import clamp
 
 
@@ -42,6 +44,19 @@ TRAINING_EXAMPLES = [
     ("stable exchange rate helps import costs", 0),
     ("markets open higher after peaceful election", 0),
     ("reserves remain adequate according to central bank", 0),
+]
+
+HOLDOUT_EXAMPLES = [
+    ("peso falls sharply as central bank reserves hit a new low", 1),
+    ("emergency rate hike follows currency selloff and inflation spike", 1),
+    ("imf talks intensify after debt pressure and dollar shortage", 1),
+    ("local currency volatility jumps on election turmoil", 1),
+    ("sovereign downgrade raises default fears", 1),
+    ("exchange rate steadies as reserves recover", 0),
+    ("inflation eases while exports support the currency", 0),
+    ("central bank says reserves remain adequate", 0),
+    ("market confidence improves after fiscal reform plan", 0),
+    ("trade surplus helps currency gain against dollar", 0),
 ]
 
 STRESS_TERMS = {
@@ -147,6 +162,23 @@ def lexicon_stress_score(text: str, theme_hits: list[str]) -> float:
     phrase_hits = sum(1 for terms in STRESS_TERMS.values() for term in terms if " " in term and term in text)
     raw = negative_hits + phrase_hits + (len(theme_hits) * 1.5) - (positive_hits * 0.75)
     return float(np.clip(raw / 8, 0, 1))
+
+
+def evaluate_news_model() -> NlpEvaluationReport:
+    model = get_news_sentiment_model()
+    texts, labels = zip(*HOLDOUT_EXAMPLES, strict=True)
+    probabilities = [float(model.predict(text)["stress_probability"]) for text in texts]
+    predictions = [1 if probability >= 0.5 else 0 for probability in probabilities]
+
+    return NlpEvaluationReport(
+        model_type="TF-IDF + logistic regression headline stress classifier",
+        holdout_examples=len(HOLDOUT_EXAMPLES),
+        accuracy=round(float(accuracy_score(labels, predictions)), 3),
+        stress_precision=round(float(precision_score(labels, predictions, pos_label=1, zero_division=0)), 3),
+        stress_recall=round(float(recall_score(labels, predictions, pos_label=1, zero_division=0)), 3),
+        stable_precision=round(float(precision_score(labels, predictions, pos_label=0, zero_division=0)), 3),
+        stable_recall=round(float(recall_score(labels, predictions, pos_label=0, zero_division=0)), 3),
+    )
 
 
 @lru_cache(maxsize=1)

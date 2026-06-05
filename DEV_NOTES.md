@@ -67,3 +67,19 @@ This file tracks all implementation progress.
 - Known issues: Classifier crisis labels are rare and metrics are baseline-only; `ARS`, `EGP`, and `NGN` still need a second FX provider; generated `data/processed` outputs are intentionally gitignored.
 - How to test: Run `.venv/bin/pytest`, `.venv/bin/ruff check .`, `npm run lint`, `npm run build`, then inspect `/model` and `/country/JPN`.
 - Notes for next agent/context: Add SHAP explanations, source persistence, unsupported FX provider, and deployment/CI.
+
+### 2026-06-04 15:45
+- Files changed: `vercel.json`, `.github/workflows/ci.yml`, `apps/web/.npmrc`, `apps/web/src/lib/api.ts`, `apps/api/pyproject.toml`, `apps/api/requirements.txt`, `apps/api/app/ml/news_sentiment.py`, `apps/api/app/ml/risk_classifier.py`, `apps/api/app/schemas/ml.py`, `apps/web/src/app/model/page.tsx`, docs and README.
+- What was implemented: Configured Vercel Services deployment, added GitHub Actions CI, slimmed backend runtime dependencies, added random-forest classifier comparison, and added NLP holdout evaluation metrics.
+- What was fixed: Vercel install now handles React 19 peer dependency conflicts with `legacy-peer-deps`; model page now reports model comparison and NLP accuracy diagnostics.
+- Known issues: Deployment is currently a Vercel preview URL; production promotion is pending explicit approval.
+- How to test: Run `.venv/bin/pytest`, `.venv/bin/ruff check .`, `npm run lint`, `npm run build`, then inspect `/model`.
+- Notes for next agent/context: Promote Vercel preview to production if requested; add SHAP/permutation explanations and chronological backtest next.
+
+### 2026-06-04 16:10
+- Files changed: `README.md`, `vercel.json`, `apps/web/src/lib/api.ts`
+- What was implemented: Deployed the validated Vercel preview at `https://atlasfx-kau9l2q16-dhruv-kekin-topranis-projects.vercel.app` and updated the README preview link.
+- What was fixed: Frontend API base URL now resolves `/server` to an absolute deployment URL during Vercel server rendering; API service budget is raised for ML cold starts.
+- Known issues: Preview has not been promoted to production because production promotion was not explicitly requested.
+- How to test: Local checks passed with `.venv/bin/pytest`, `.venv/bin/ruff check .`, `npm run lint`, and `npm run build`.
+- Notes for next agent/context: If production is requested, run `vercel deploy --prod` after an in-browser smoke test of the preview.

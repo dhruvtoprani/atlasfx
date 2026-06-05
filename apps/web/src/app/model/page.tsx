@@ -17,11 +17,14 @@ const weights: [string, number][] = [
 const fallbackModelInfo: MlModelInfo = {
   modelType: "Logistic regression FX regime classifier",
   status: "API offline",
+  selectedModel: null,
   source: "Frankfurter historical FX windows",
   labels: ["Stable", "Watchlist", "Stress", "Crisis Risk"],
   features: ["fx_depreciation_30d", "fx_depreciation_90d", "fx_volatility_30d", "fx_volatility_90d"],
   metrics: null,
+  modelComparison: {},
   featureImportance: [],
+  nlpEvaluation: null,
   limitations: ["Run the FastAPI backend to train and inspect the live classifier."],
 };
 
@@ -61,6 +64,7 @@ export default async function ModelPage() {
           <p className="mt-3 text-sm leading-6 text-slate-400">{modelInfo.source}</p>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             <Metric label="Status" value={modelInfo.status} />
+            <Metric label="Selected Model" value={modelInfo.selectedModel ?? "N/A"} />
             <Metric
               label="Training Rows"
               value={modelInfo.metrics ? formatNumber(modelInfo.metrics.trainingExamples, 0) : "N/A"}
@@ -92,6 +96,53 @@ export default async function ModelPage() {
               </p>
             )}
           </div>
+        </div>
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-[1fr_0.8fr]">
+        <div className="rounded-lg border border-white/10 bg-white/[0.045] p-6">
+          <h2 className="text-xl font-semibold text-white">Classifier Model Comparison</h2>
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full min-w-[620px] text-left text-sm">
+              <thead className="text-xs uppercase tracking-[0.14em] text-slate-500">
+                <tr>
+                  <th className="py-3 pr-4 font-medium">Model</th>
+                  <th className="py-3 pr-4 font-medium">Accuracy</th>
+                  <th className="py-3 pr-4 font-medium">Macro F1</th>
+                  <th className="py-3 pr-4 font-medium">Crisis Recall</th>
+                  <th className="py-3 pr-4 font-medium">Crisis Precision</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(modelInfo.modelComparison).map(([name, metrics]) => (
+                  <tr key={name} className="border-t border-white/10 text-slate-300">
+                    <td className="py-3 pr-4 font-medium text-white">{name}</td>
+                    <td className="py-3 pr-4 font-mono">{formatMetric(metrics.accuracy)}</td>
+                    <td className="py-3 pr-4 font-mono">{formatMetric(metrics.macroF1)}</td>
+                    <td className="py-3 pr-4 font-mono">{formatMetric(metrics.crisisRecall)}</td>
+                    <td className="py-3 pr-4 font-mono">{formatMetric(metrics.crisisPrecision)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div className="rounded-lg border border-white/10 bg-white/[0.045] p-6">
+          <h2 className="text-xl font-semibold text-white">NLP Holdout Evaluation</h2>
+          {modelInfo.nlpEvaluation ? (
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              <Metric label="Examples" value={formatNumber(modelInfo.nlpEvaluation.holdoutExamples, 0)} />
+              <Metric label="Accuracy" value={formatMetric(modelInfo.nlpEvaluation.accuracy)} />
+              <Metric label="Stress Recall" value={formatMetric(modelInfo.nlpEvaluation.stressRecall)} />
+              <Metric label="Stress Precision" value={formatMetric(modelInfo.nlpEvaluation.stressPrecision)} />
+              <Metric label="Stable Recall" value={formatMetric(modelInfo.nlpEvaluation.stableRecall)} />
+              <Metric label="Stable Precision" value={formatMetric(modelInfo.nlpEvaluation.stablePrecision)} />
+            </div>
+          ) : (
+            <p className="mt-4 rounded-md border border-white/10 bg-black/20 p-4 text-sm text-slate-300">
+              Start the API to evaluate the local headline NLP model.
+            </p>
+          )}
         </div>
       </section>
 

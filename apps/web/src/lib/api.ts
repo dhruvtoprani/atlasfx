@@ -8,12 +8,24 @@ import type {
   MlMetricReport,
   MlModelInfo,
   MlSignal,
+  NlpEvaluationReport,
   NewsArticle,
   NewsSignal,
   SeriesPoint,
 } from "@/types/atlas";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_ATLASFX_API_URL ?? "http://127.0.0.1:8000";
+function getApiBaseUrl(): string {
+  const configuredUrl =
+    process.env.NEXT_PUBLIC_ATLASFX_API_URL ??
+    process.env.NEXT_PUBLIC_API_URL ??
+    (process.env.VERCEL_URL ? "/server" : undefined);
+
+  if (configuredUrl?.startsWith("/") && typeof window === "undefined" && process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}${configuredUrl}`;
+  }
+
+  return configuredUrl ?? "http://127.0.0.1:8000";
+}
 
 type ApiCountryRiskRow = {
   country_code: string;
@@ -123,12 +135,25 @@ type ApiMlMetricReport = {
 type ApiMlModelInfo = {
   model_type: string;
   status: string;
+  selected_model: string | null;
   source: string;
   labels: string[];
   features: string[];
   metrics: ApiMlMetricReport | null;
+  model_comparison: Record<string, ApiMlMetricReport>;
   feature_importance: ApiMlFeatureImportance[];
+  nlp_evaluation: ApiNlpEvaluationReport | null;
   limitations: string[];
+};
+
+type ApiNlpEvaluationReport = {
+  model_type: string;
+  holdout_examples: number;
+  accuracy: number;
+  stress_precision: number;
+  stress_recall: number;
+  stable_precision: number;
+  stable_recall: number;
 };
 
 type ApiMlSignal = {
@@ -298,12 +323,29 @@ function toMlModelInfo(info: ApiMlModelInfo): MlModelInfo {
   return {
     modelType: info.model_type,
     status: info.status,
+    selectedModel: info.selected_model,
     source: info.source,
     labels: info.labels,
     features: info.features,
     metrics: info.metrics ? toMlMetricReport(info.metrics) : null,
+    modelComparison: Object.fromEntries(
+      Object.entries(info.model_comparison).map(([name, metrics]) => [name, toMlMetricReport(metrics)]),
+    ),
     featureImportance: info.feature_importance.map(toMlFeatureImportance),
+    nlpEvaluation: info.nlp_evaluation ? toNlpEvaluationReport(info.nlp_evaluation) : null,
     limitations: info.limitations,
+  };
+}
+
+function toNlpEvaluationReport(report: ApiNlpEvaluationReport): NlpEvaluationReport {
+  return {
+    modelType: report.model_type,
+    holdoutExamples: report.holdout_examples,
+    accuracy: report.accuracy,
+    stressPrecision: report.stress_precision,
+    stressRecall: report.stress_recall,
+    stablePrecision: report.stable_precision,
+    stableRecall: report.stable_recall,
   };
 }
 
@@ -315,7 +357,7 @@ function toDisplaySeries(points: SeriesPoint[]): SeriesPoint[] {
 }
 
 export async function fetchGlobalRisk(): Promise<GlobalRiskData> {
-  const response = await fetch(`${API_BASE_URL}/api/risk/global`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/risk/global`, {
     headers: { Accept: "application/json" },
   });
 
@@ -333,7 +375,7 @@ export async function fetchGlobalRisk(): Promise<GlobalRiskData> {
 }
 
 export async function fetchCountryRisk(countryCode: string): Promise<CountryRiskDetail> {
-  const response = await fetch(`${API_BASE_URL}/api/risk/country/${countryCode}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/risk/country/${countryCode}`, {
     headers: { Accept: "application/json" },
   });
 
@@ -345,7 +387,7 @@ export async function fetchCountryRisk(countryCode: string): Promise<CountryRisk
 }
 
 export async function fetchModelInfo(): Promise<MlModelInfo> {
-  const response = await fetch(`${API_BASE_URL}/api/model/feature-importance`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/model/feature-importance`, {
     headers: { Accept: "application/json" },
   });
 

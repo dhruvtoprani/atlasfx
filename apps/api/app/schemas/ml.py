@@ -11,6 +11,16 @@ class MlMetricReport(BaseModel):
     class_distribution: dict[str, int]
 
 
+class NlpEvaluationReport(BaseModel):
+    model_type: str
+    holdout_examples: int
+    accuracy: float
+    stress_precision: float
+    stress_recall: float
+    stable_precision: float
+    stable_recall: float
+
+
 class MlFeatureImportance(BaseModel):
     feature: str
     importance: float
@@ -19,11 +29,14 @@ class MlFeatureImportance(BaseModel):
 class MlModelInfo(BaseModel):
     model_type: str
     status: str
+    selected_model: str | None = None
     source: str
     labels: list[str]
     features: list[str]
     metrics: MlMetricReport | None
+    model_comparison: dict[str, MlMetricReport] = {}
     feature_importance: list[MlFeatureImportance]
+    nlp_evaluation: NlpEvaluationReport | None = None
     limitations: list[str]
 
 

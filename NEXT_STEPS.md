@@ -28,8 +28,13 @@ This file tracks unfinished work so progress can continue after context truncati
 - [x] Replace live scoring macro/news mocks with real signals
 - [x] Expand country universe from 20 to 32 where Frankfurter supports FX
 - [x] Add logistic-regression FX regime classifier
+- [x] Add random-forest classifier comparison
+- [x] Add local NLP holdout evaluation
 - [x] Remove replay routes and UI
 - [x] Pull 32-country news and macro snapshots into `data/processed`
+- [x] Configure Vercel Services deployment
+- [x] Deploy Vercel preview
+- [x] Add GitHub Actions CI
 - [ ] Persist fetched FX data under `data/raw`
 - [ ] Persist fetched RSS/GDELT data under `data/raw`
 - [ ] Add API integration tests
@@ -41,6 +46,7 @@ This file tracks unfinished work so progress can continue after context truncati
 - [ ] Add clean historical FX source for ARS, EGP, and NGN or hide FX metrics for unsupported currencies
 - [ ] Add live country detail API integration tests
 - [ ] Add chronological backtest report for the ML classifier
+- [ ] Promote Vercel preview to production after final smoke test
 
 ## Later
 - [ ] Add SHAP explanations

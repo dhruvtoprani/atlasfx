@@ -50,10 +50,11 @@ Macro stress uses latest available World Bank indicators:
 
 Missing macro coverage receives a neutral no-data score instead of a mock value.
 
-## ML Classifier
+## ML Classifiers
 
-The baseline classifier is a scikit-learn logistic regression model trained on
-historical Frankfurter FX windows. Training examples use trailing FX features:
+The baseline classifier suite trains scikit-learn logistic regression and
+random forest models on historical Frankfurter FX windows. Training examples use
+trailing FX features:
 
 - 30-day depreciation
 - 90-day depreciation
@@ -63,6 +64,12 @@ historical Frankfurter FX windows. Training examples use trailing FX features:
 
 Labels are derived from future 30-day depreciation buckets. Current classifier
 metrics are baseline diagnostics, not production-grade crisis forecasts.
+
+## NLP Evaluation
+
+The headline stress classifier reports holdout accuracy, stress precision,
+stress recall, stable precision, and stable recall on a curated finance-headline
+holdout set. This keeps the local NLP layer auditable without requiring an LLM.
 
 ## Risk Labels
 
