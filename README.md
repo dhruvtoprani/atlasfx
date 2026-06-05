@@ -6,7 +6,7 @@ AtlasFX is a portfolio-grade financial ML dashboard that turns exchange-rate
 movement, headline sentiment, and macro indicators into an explainable
 country-level currency stress signal.
 
-**Live preview:** [atlasfx-84zwjxszk-dhruv-kekin-topranis-projects.vercel.app](https://atlasfx-84zwjxszk-dhruv-kekin-topranis-projects.vercel.app)
+**Live production:** [atlasfx-zeta.vercel.app](https://atlasfx-zeta.vercel.app)
 
 ## Demo
 

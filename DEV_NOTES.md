@@ -91,3 +91,11 @@ This file tracks all implementation progress.
 - Known issues: Production promotion is still pending explicit approval; chronological ML backtesting and raw source persistence remain next.
 - How to test: `.venv/bin/pytest`, `.venv/bin/ruff check .`, `npm run lint`, and `npm run build` all pass.
 - Notes for next agent/context: Final preview is `https://atlasfx-84zwjxszk-dhruv-kekin-topranis-projects.vercel.app`; if approved, promote with `vercel deploy --prod`.
+
+### 2026-06-04 21:05
+- Files changed: `README.md`, `NEXT_STEPS.md`, `DEV_NOTES.md`
+- What was implemented: Promoted AtlasFX to Vercel production at `https://atlasfx-zeta.vercel.app`.
+- What was fixed: README now points to the clean production URL instead of a preview URL.
+- Known issues: None for deployment; next product work is raw data persistence and chronological ML backtesting.
+- How to test: Vercel production deployment completed with `readyState=READY`.
+- Notes for next agent/context: Production deployment id is `dpl_CfRS9uFjBfPR9QAcYiBt6t8YAJ8W`.

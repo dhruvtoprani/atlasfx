@@ -48,7 +48,7 @@ This file tracks unfinished work so progress can continue after context truncati
 - [ ] Persist RSS/GDELT article responses and sentiment outputs
 - [ ] Add live country detail API integration tests
 - [ ] Add chronological backtest report for the ML classifier
-- [ ] Promote Vercel preview to production after final smoke test
+- [x] Promote Vercel preview to production
 
 ## Later
 - [ ] Add SHAP explanations
