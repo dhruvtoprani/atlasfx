@@ -1,21 +1,21 @@
 # AtlasFX
 
-**A global money weather map for currency stress detection.**
+[![Live Product](https://img.shields.io/badge/Live_Product-atlasfx--zeta.vercel.app-C7FF3D?style=for-the-badge&logo=vercel&logoColor=17111F)](https://atlasfx-zeta.vercel.app)
+[![Finance ML](https://img.shields.io/badge/Domain-Financial_ML-7C5CFF?style=for-the-badge)](https://github.com/dhruvtoprani/atlasfx)
+[![Backend](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Frontend](https://img.shields.io/badge/Frontend-Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
 
-AtlasFX is a portfolio-grade financial ML dashboard that turns exchange-rate
-movement, headline sentiment, and macro indicators into an explainable
-country-level currency stress signal.
+AtlasFX is a global money-weather map for explainable currency stress detection.
 
-**Live production:** [atlasfx-zeta.vercel.app](https://atlasfx-zeta.vercel.app)
+It turns exchange-rate movement, headline sentiment, and macro indicators into country-level stress signals with source quality, model diagnostics, and transparent no-trading-claims framing.
+
+AtlasFX does **not** forecast exact FX prices and it does **not** provide financial advice. The product goal is early stress detection: show where pressure is building, why the model thinks it matters, and which signals are driving the score.
+
+**Links:** [Live product](https://atlasfx-zeta.vercel.app) · [Source repository](https://github.com/dhruvtoprani/atlasfx) · [Architecture](#architecture) · [Data sources](#data-sources) · [Local setup](#local-setup) · [Roadmap](#roadmap)
 
 ## Demo
 
 ![AtlasFX demo walkthrough](docs/assets/atlasfx-demo.gif)
-
-It does **not** forecast exact FX prices and it does **not** provide financial
-advice. The product goal is early stress detection: show where pressure is
-building, why the model thinks it matters, and which signals are driving the
-score.
 
 ## Product Snapshot
 
@@ -116,9 +116,7 @@ AtlasFX Stress Score =
 + 0.20 * Macro Stress Score
 ```
 
-The current ML classifier is separate from the rule score. It trains baseline
-logistic regression and random forest models on historical Frankfurter FX
-windows and labels each window by future 30-day depreciation:
+The current ML classifier is separate from the rule score. It trains baseline logistic regression and random forest models on historical Frankfurter FX windows and labels each window by future 30-day depreciation:
 
 | Future 30-day depreciation | Label |
 | ---: | --- |
@@ -176,8 +174,7 @@ npm run dev
 
 Open `http://127.0.0.1:3000`.
 
-The web app reads `NEXT_PUBLIC_ATLASFX_API_URL`; if unset, it uses
-`http://127.0.0.1:8000`.
+The web app reads `NEXT_PUBLIC_ATLASFX_API_URL`; if unset, it uses `http://127.0.0.1:8000`.
 
 ## Snapshot Scripts
 
@@ -188,8 +185,7 @@ cd apps/api
 .venv/bin/python scripts/train_model.py
 ```
 
-These scripts write generated reports under `data/processed/`, which is ignored
-by git to avoid committing bulky derived data.
+These scripts write generated reports under `data/processed/`, which is ignored by git to avoid committing bulky derived data.
 
 ## Validation
 
@@ -230,6 +226,4 @@ Current validation status:
 
 ## Disclaimer
 
-AtlasFX is a research and analytics project. It is not financial advice,
-investment advice, or a trading recommendation system. Currency markets are
-volatile and affected by many unpredictable factors.
+AtlasFX is a research and analytics project. It is not financial advice, investment advice, or a trading recommendation system. Currency markets are volatile and affected by many unpredictable factors.
